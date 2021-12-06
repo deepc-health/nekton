@@ -1,6 +1,9 @@
-# pypi template
+# Nekton
 
-> A minimal template for creating a pypi package
+> A python package for DICOM to NifTi and NifTi to DICOM-SEG and GSPS conversion
+
+
+======
 
 Use this template to more easily create a project project to submit to pypi and conda.
 
