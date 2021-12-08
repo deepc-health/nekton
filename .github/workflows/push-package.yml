@@ -5,18 +5,16 @@ on:
     branches: [ master ]
   pull_request:
     branches: [ master ]
-    
+
 jobs:
-  docker:
+  build:
+
     runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v2
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: '3.8.5'
+    
     - name: Push Package
       run: |
-       make release
-    
+        pip install -r requirements.txt
+        make release

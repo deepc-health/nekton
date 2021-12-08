@@ -4,8 +4,7 @@ SHELL := /bin/bash
 all: release
 .PHONY: all release conda_release pypi clean dict
 
-release: pypi
-	fastrelease_conda_package --upload_user fastai
+release: pypi, conda_release
 	fastrelease_bump_version
 
 conda_release:
