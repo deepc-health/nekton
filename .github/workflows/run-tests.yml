@@ -29,14 +29,13 @@ jobs:
         pytest tests/  --cov-report=xml --cov=nekton --junitxml=./coverage.xml
 
     - name: Code Coverage Summary Report
-      uses: irongut/CodeCoverageSummary@v1.2.0
+      run: |
+       pip install coverage
+       coverage combine && coverage report --fail-under=90 -m
+       coverage html 
+
+    - name: Archive code coverage html report
+      uses: actions/upload-artifact@v2
       with:
-        filename: ./coverage.xml
-        badge: true
-        fail_below_min: true
-        format: markdown
-        hide_branch_rate: false
-        hide_complexity: true
-        indicators: true
-        output: both
-        thresholds: '60 80'
+        name: code-coverage-report
+        path: nekton/htmlcov
