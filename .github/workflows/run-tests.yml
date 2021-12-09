@@ -26,15 +26,12 @@ jobs:
     
     - name: Test with pytest
       run: |
-        pytest tests/ --cov-report= --cov=nekton --junitxml=./coverage
-
-    - name: Copy Coverage To Predictable Location
-      run: cp coverage/**/coverage.cobertura.xml coverage.cobertura.xml
+        pytest tests/ --cov-report= --cov=nekton --junitxml=./coverage/
 
     - name: Code Coverage Summary Report
       uses: irongut/CodeCoverageSummary@v1.0.2
       with:
-        filename: coverage/coverage.cobertura.xml
+        filename: ./coverage.xml
         badge: true
         fail_below_min: true
         format: markdown
