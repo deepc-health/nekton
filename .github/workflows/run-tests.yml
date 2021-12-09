@@ -26,7 +26,7 @@ jobs:
     
     - name: Test with pytest
       run: |
-        pytest tests/ --cov-report= --cov=nekton --junitxml=./coverage/
+        pytest tests/ --cov-report= --cov=nekton --junitxml=./coverage.xml
 
     - name: Code Coverage Summary Report
       uses: irongut/CodeCoverageSummary@v1.0.2
