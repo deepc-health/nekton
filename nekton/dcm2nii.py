@@ -5,11 +5,14 @@ from typing import List
 import pydicom
 
 from utils.dicom import is_file_a_dicom
+from utils.bin import make_exec_bin, run_bin
 from base import baseConverter
 
 
 class Dcm2Nii(baseConverter):
     def __init__(self):
+        make_exec_bin()
+        self.run_bin = run_bin
         super().__init__()
 
     def get_all_dicoms(self, dicom_directory: str) -> List[str]:
@@ -60,24 +63,38 @@ class Dcm2Nii(baseConverter):
         )
         return False if len(all_slice_thickness) == 1 else True
 
-    def _run_conv_variable(self, all_dcm_paths: List[str], name: str) -> str:
+    def _run_conv_variable(self, dicom_directory: str) -> List[str]:
         raise NotImplementedError(
             "DICOM with variable slice thickness cannot to be handled yet!!"
         )
-        return ""
+        return [""]
 
-    def _run_conv_uniform(self, all_dcm_paths: List[str], name: str) -> str:
-        return ""
+    def rename_files(self, inp_file_list: List[str]) -> List[str]:
+        return inp_file_list
 
-    def run(self, dicom_directory: str, name: str) -> str:
+    def _run_conv_uniform(self, dicom_directory: str) -> List[str]:
+        self.run_bin(dicom_directory)
+        output_files = glob.glob(os.path.join(dicom_directory, "*.nii.gz"))
+        return output_files
+
+    def run(self, dicom_directory: str, name: str = "") -> List[str]:
         try:
             all_dcm_paths = self.get_all_dicoms(dicom_directory)
         except Exception as err:
             raise RuntimeError(f"Error parsing dicoms: {err}")
 
         if self.check_slice_thickness_variable(all_dcm_paths):
-            converted_file_path = self._run_conv_variable(all_dcm_paths, name)
+            converted_file_paths = self._run_conv_variable(dicom_directory)
         else:
-            converted_file_path = self._run_conv_uniform(all_dcm_paths, name)
+            converted_file_paths = self._run_conv_uniform(dicom_directory)
 
-        return converted_file_path
+        if name != "":
+            try:
+                converted_file_paths = self.rename_files(converted_file_paths)
+            except Exception as err:
+                raise RuntimeError(f"Error renaming output NifTi: {err}")
+
+        print(
+            f"\nConverted {len(all_dcm_paths)} DCM to Nifti; Output stored @ {dicom_directory}\n"
+        )
+        return converted_file_paths
