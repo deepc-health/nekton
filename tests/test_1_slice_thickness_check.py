@@ -53,6 +53,8 @@ def test_1_2_check_slice_thickness_variable(converter_nii, site_package_path):
 @pytest.mark.dcm2nii
 def test_1_3_check_end2end_variable(converter_nii):
     with pytest.raises(NotImplementedError):
+        converter_nii._run_conv_variable([], name="")
+    with pytest.raises(RuntimeError):
         converter_nii.run("tests/test_data/variable_SliceThickness", name="")
 
 

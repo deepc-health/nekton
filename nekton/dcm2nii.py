@@ -5,14 +5,15 @@ from typing import List
 import pydicom
 
 from utils.dicom import is_file_a_dicom
-from base import baseConverter
+from base import BaseConverter
 
 
-class Dcm2Nii(baseConverter):
+class Dcm2Nii(BaseConverter):
     def __init__(self):
         super().__init__()
 
-    def get_all_dicoms(self, dicom_directory: str) -> List[str]:
+    @staticmethod
+    def get_all_dicoms(dicom_directory: str) -> List[str]:
         """Class method to read all dicoms in adirectory
 
         Args:
@@ -75,9 +76,12 @@ class Dcm2Nii(baseConverter):
         except Exception as err:
             raise RuntimeError(f"Error parsing dicoms: {err}")
 
-        if self.check_slice_thickness_variable(all_dcm_paths):
-            converted_file_path = self._run_conv_variable(all_dcm_paths, name)
-        else:
-            converted_file_path = self._run_conv_uniform(all_dcm_paths, name)
+        try:
+            if self.check_slice_thickness_variable(all_dcm_paths):
+                converted_file_path = self._run_conv_variable(all_dcm_paths, name)
+            else:
+                converted_file_path = self._run_conv_uniform(all_dcm_paths, name)
+        except Exception as err:
+            raise RuntimeError(f"Error converting DCM to NifTi: {err}")
 
         return converted_file_path
