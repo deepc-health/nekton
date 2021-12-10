@@ -6,6 +6,7 @@ import pydicom
 
 from utils.dicom import is_file_a_dicom
 from utils.bin import make_exec_bin, run_bin
+from utils.fileops import rename_file
 
 from base import BaseConverter
 
@@ -71,15 +72,61 @@ class Dcm2Nii(BaseConverter):
         )
         return [""]
 
-    def rename_files(self, inp_file_list: List[str], name: str) -> List[str]:
-        return inp_file_list
+    def rename_converted_files(self, inp_file_list: List[str], name: str) -> List[str]:
+        """Rename a file while preserving the suffix from dcm2niix
+
+        Args:
+            inp_file_list (List[str]): list of files to renamed
+            name (str): new name of the file
+
+        Returns:
+            List[str]: list of renamed files
+        """
+        # preserve all suffixes
+        dcm2niix_suffix = [
+            os.path.basename(file_path).split("_")[1:] for file_path in inp_file_list
+        ]
+
+        out_file_list = []
+
+        # rename files
+        for i, file_path in enumerate(inp_file_list):
+            fname = (
+                name + "_" + "_".join(dcm2niix_suffix[i])
+                if len(dcm2niix_suffix[i]) > 0
+                else name
+            )
+            out_file_list.append(rename_file(file_path, fname))
+        return out_file_list
 
     def _run_conv_uniform(self, dicom_directory: str) -> List[str]:
+        """run the binary on the input directory
+
+        Args:
+            dicom_directory (str): directory of the dicoms
+
+        Returns:
+            List[str]: output NifTi files post conversion
+        """
         self.run_bin(dicom_directory)
-        output_files = glob.glob(os.path.join(dicom_directory, "*.nii.gz"))
+        output_files = glob.glob(os.path.join(dicom_directory, "*.nii*"))
         return output_files
 
     def run(self, dicom_directory: str, name: str = "") -> List[str]:
+        """Run the dcm to nifti conversion in a directory
+
+        Args:
+            dicom_directory (str): path to directory with Dicoms
+            name (str, optional): Name to be given to the output file. Defaults to "".
+
+        Raises:
+            RuntimeError: Parsing dicom error
+            RuntimeError: Conversion error
+            RuntimeError: Renaming error
+
+        Returns:
+            List[str]: output list of Nifti files
+        """
         try:
             all_dcm_paths = self.get_all_dicoms(dicom_directory)
         except Exception as err:
@@ -95,7 +142,9 @@ class Dcm2Nii(BaseConverter):
 
         if name != "":
             try:
-                converted_file_paths = self.rename_files(converted_file_paths, name)
+                converted_file_paths = self.rename_converted_files(
+                    converted_file_paths, name
+                )
             except Exception as err:
                 raise RuntimeError(f"Error renaming output NifTi: {err}")
 

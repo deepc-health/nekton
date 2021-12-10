@@ -1,12 +1,12 @@
 import pytest
 import os
 import json
+import subprocess
 
 from utils.json_helpers import read_json, write_json
 from utils.dicom import is_file_a_dicom
 from utils.bin import make_exec_bin, run_bin
-
-import subprocess
+from utils.fileops import rename_file
 
 
 @pytest.mark.utilstest
@@ -75,6 +75,7 @@ def test_0_4_check_make_exec_bin():
     assert os.access(PATH_TO_BIN, os.X_OK)
 
 
+@pytest.mark.utilstest
 def test_0_4_check_make_run_bin(site_package_path):
     path_dcms = os.path.join(
         site_package_path, "pydicom/data/test_files/dicomdirtests/98892001/CT5N/"
@@ -86,3 +87,19 @@ def test_0_4_check_make_run_bin(site_package_path):
     )
     assert os.path.exists(out_path)
     os.remove(out_path)
+
+
+@pytest.mark.utilstest
+def test_0_5_rename_file():
+    file_path = "./trial.txt"
+    subprocess.run(f"touch {file_path}", shell=True, universal_newlines=True)
+    assert os.path.exists(file_path)
+
+    out_path = rename_file(file_path, "not_so_trial")
+    assert "not_so_trial" in out_path
+    assert os.path.exists(file_path) is False
+    os.remove(out_path)
+
+    # passing file that does not exist
+    with pytest.raises(RuntimeError):
+        rename_file(out_path, "not_so_trial")
