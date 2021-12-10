@@ -33,7 +33,9 @@ def test_1_2_check_slice_thickness_variable(converter_nii, site_package_path):
     path_dcms = os.path.join(
         site_package_path, "pydicom/data/test_files/dicomdirtests/98892001/CT5N/"
     )
-    path_dcms_list = glob.glob(os.path.join(path_dcms, "*"))
+    path_dcms_list = [
+        path for path in glob.glob(os.path.join(path_dcms, "*")) if ".json" not in path
+    ]
     assert converter_nii.check_slice_thickness_variable(path_dcms_list) is False
 
     # samples with variable slice thickness
