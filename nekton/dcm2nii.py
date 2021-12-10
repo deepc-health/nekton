@@ -6,16 +6,18 @@ import pydicom
 
 from utils.dicom import is_file_a_dicom
 from utils.bin import make_exec_bin, run_bin
-from base import baseConverter
+
+from base import BaseConverter
 
 
-class Dcm2Nii(baseConverter):
+class Dcm2Nii(BaseConverter):
     def __init__(self):
         make_exec_bin()
         self.run_bin = run_bin
         super().__init__()
 
-    def get_all_dicoms(self, dicom_directory: str) -> List[str]:
+    @staticmethod
+    def get_all_dicoms(dicom_directory: str) -> List[str]:
         """Class method to read all dicoms in adirectory
 
         Args:
@@ -69,7 +71,7 @@ class Dcm2Nii(baseConverter):
         )
         return [""]
 
-    def rename_files(self, inp_file_list: List[str]) -> List[str]:
+    def rename_files(self, inp_file_list: List[str], name: str) -> List[str]:
         return inp_file_list
 
     def _run_conv_uniform(self, dicom_directory: str) -> List[str]:
@@ -83,18 +85,22 @@ class Dcm2Nii(baseConverter):
         except Exception as err:
             raise RuntimeError(f"Error parsing dicoms: {err}")
 
-        if self.check_slice_thickness_variable(all_dcm_paths):
-            converted_file_paths = self._run_conv_variable(dicom_directory)
-        else:
-            converted_file_paths = self._run_conv_uniform(dicom_directory)
+        try:
+            if self.check_slice_thickness_variable(all_dcm_paths):
+                converted_file_paths = self._run_conv_variable(dicom_directory)
+            else:
+                converted_file_paths = self._run_conv_uniform(dicom_directory)
+        except Exception as err:
+            raise RuntimeError(f"Error converting DCM to NifTi: {err}")
 
         if name != "":
             try:
-                converted_file_paths = self.rename_files(converted_file_paths)
+                converted_file_paths = self.rename_files(converted_file_paths, name)
             except Exception as err:
                 raise RuntimeError(f"Error renaming output NifTi: {err}")
 
         print(
             f"\nConverted {len(all_dcm_paths)} DCM to Nifti; Output stored @ {dicom_directory}\n"
         )
+
         return converted_file_paths

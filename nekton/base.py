@@ -2,7 +2,7 @@ from utils.json_helpers import write_json
 import os
 
 
-class baseConverter:
+class BaseConverter:
     def __init__(self):
         pass
 
