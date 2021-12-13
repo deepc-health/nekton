@@ -37,3 +37,13 @@ def read_json(path: str) -> dict:
         raise RuntimeError(f"Unable to read json: {err}")
 
     return json_object
+
+
+def verify_label_dcmqii_json(path: str) -> bool:
+    try:
+        with open(path, "r") as openfile:
+            data = json.load(openfile)
+    except Exception:
+        raise NameError(f"Invalid Json at {path}")
+    assert data
+    return True
