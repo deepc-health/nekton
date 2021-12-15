@@ -1,0 +1,3 @@
+[submodule "nekton/externals/dcmqi"]
+	path = nekton/externals/dcmqi
+	url = git@github.com:QIICR/dcmqi.git

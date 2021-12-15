@@ -3,7 +3,7 @@ import os
 import json
 import subprocess
 
-from utils.json_helpers import read_json, write_json
+from utils.json_helpers import read_json, write_json, verify_label_dcmqii_json
 from utils.dicom import is_file_a_dicom
 from utils.bin import make_exec_bin, run_bin
 from utils.fileops import rename_file
@@ -103,3 +103,22 @@ def test_0_5_rename_file():
     # passing file that does not exist
     with pytest.raises(RuntimeError):
         rename_file(out_path, "not_so_trial")
+
+
+@pytest.mark.utilstest
+def test_0_6_schema_validator():
+    # conformal json
+    proper_json = "nekton/externals/dcmqi/doc/examples/seg-example.json"
+    assert verify_label_dcmqii_json(proper_json)
+
+    # creating a non-conformal json
+    dict_data = {"key1": 1, "key2": "a"}
+    improper_json = write_json(dict_data, "./test.json")
+    with pytest.raises(NotImplementedError):
+        verify_label_dcmqii_json(improper_json)
+    os.remove(improper_json)
+
+    # this path does not exist
+    not_existing_json = "./not-existing.json"
+    with pytest.raises(NameError):
+        verify_label_dcmqii_json(not_existing_json)
