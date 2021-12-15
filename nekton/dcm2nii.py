@@ -70,7 +70,6 @@ class Dcm2Nii(BaseConverter):
         raise NotImplementedError(
             "DICOM with variable slice thickness cannot to be handled yet!!"
         )
-        return [""]
 
     def rename_converted_files(self, inp_file_list: List[str], name: str) -> List[str]:
         """Rename a file while preserving the suffix from dcm2niix
