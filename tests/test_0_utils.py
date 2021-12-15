@@ -3,6 +3,9 @@ import os
 import json
 import subprocess
 
+from os.path import abspath
+from os.path import dirname as d
+
 from utils.json_helpers import read_json, write_json, verify_label_dcmqii_json
 from utils.dicom import is_file_a_dicom
 from utils.bin import make_exec_bin, run_bin
@@ -108,7 +111,9 @@ def test_0_5_rename_file():
 @pytest.mark.utilstest
 def test_0_6_schema_validator():
     # conformal json
-    proper_json = "nekton/externals/dcmqi/doc/examples/seg-example.json"
+    proper_json = os.path.join(
+        d(d(abspath(__file__))), "nekton/externals/dcmqi/doc/examples/seg-example.json"
+    )
     assert verify_label_dcmqii_json(proper_json)
 
     # creating a non-conformal json
