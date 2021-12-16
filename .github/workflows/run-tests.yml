@@ -17,11 +17,6 @@ jobs:
         python -m pip install --upgrade pip
         pip install flake8 pytest pytest-cov
         pip install -r requirements.txt
-
-    - name: Submodules Setup
-      uses: actions/checkout@v2
-      with:
-        submodules: recursive
         
     - name: Lint with flake8
       run: |
@@ -30,6 +25,11 @@ jobs:
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     
+    - name: Submodules Setup
+      uses: actions/checkout@v2
+      with:
+        submodules: recursive
+
     - name: Test with pytest
       run: |
         pytest tests/  --cov-report=xml --cov=nekton --junitxml=./coverage.xml
