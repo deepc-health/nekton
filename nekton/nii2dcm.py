@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 
 from base import BaseConverter
 from utils.json_helpers import verify_label_dcmqii_json
@@ -7,7 +8,7 @@ from utils.json_helpers import verify_label_dcmqii_json
 class Nii2Dcm(BaseConverter):
     def __init__(
         self,
-        segmentation_map: str,
+        segmentation_map: Path,
         out_dcm_format: str = "dicomseg",
         segmentation_type: str = "multiclass",
     ):

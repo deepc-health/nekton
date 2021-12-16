@@ -1,5 +1,6 @@
 from utils.json_helpers import write_json
 import os
+from pathlib import Path
 
 
 class BaseConverter:
@@ -7,19 +8,19 @@ class BaseConverter:
         pass
 
     @staticmethod
-    def write_dict_json(directory: str, data_dict: dict, name: str) -> str:
+    def write_dict_json(directory: Path, data_dict: dict, name: str) -> Path:
         """write a dictionary type to json file
 
         Args:
-            directory (str): directory where the json has to be stored
+            directory (Path): directory where the json has to be stored
             data_dict (dict): dictionary to be made json
-            name (str): name of the json file
+            name (Path): name of the json file
 
         Returns:
-            str: the path of the stored json
+            Path: the path of the stored json
         """
         if ".json" not in name:
             name += ".json"
-        output_filepath = os.path.join(directory, name)
+        output_filepath = Path(os.path.join(directory, name))
         write_json(data_dict, output_filepath)
         return output_filepath
