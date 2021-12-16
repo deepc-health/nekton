@@ -17,7 +17,12 @@ jobs:
         python -m pip install --upgrade pip
         pip install flake8 pytest pytest-cov
         pip install -r requirements.txt
-        git submodule init
+
+    - name: Submodules Setup
+      uses: actions/checkout@v2
+      with:
+        submodules: recursive
+        
     - name: Lint with flake8
       run: |
         # stop the build if there are Python syntax errors or undefined names
