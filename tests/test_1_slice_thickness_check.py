@@ -2,13 +2,6 @@ import pytest
 import os
 import glob
 
-from dcm2nii import Dcm2Nii
-
-
-@pytest.fixture
-def converter_nii():
-    yield Dcm2Nii()
-
 
 @pytest.mark.dcm2nii
 def test_1_1_check_read_dicom(converter_nii, site_package_path):
@@ -40,7 +33,9 @@ def test_1_2_check_slice_thickness_variable(converter_nii, site_package_path):
     path_dcms = os.path.join(
         site_package_path, "pydicom/data/test_files/dicomdirtests/98892001/CT5N/"
     )
-    path_dcms_list = glob.glob(os.path.join(path_dcms, "*"))
+    path_dcms_list = [
+        path for path in glob.glob(os.path.join(path_dcms, "*")) if ".json" not in path
+    ]
     assert converter_nii.check_slice_thickness_variable(path_dcms_list) is False
 
     # samples with variable slice thickness
@@ -48,16 +43,3 @@ def test_1_2_check_slice_thickness_variable(converter_nii, site_package_path):
         os.path.join("tests/test_data/variable_SliceThickness/*")
     )
     assert converter_nii.check_slice_thickness_variable(path_dcms_list)
-
-
-@pytest.mark.dcm2nii
-def test_1_3_check_end2end_variable(converter_nii):
-    with pytest.raises(NotImplementedError):
-        converter_nii._run_conv_variable([], name="")
-    with pytest.raises(RuntimeError):
-        converter_nii.run("tests/test_data/variable_SliceThickness", name="")
-
-
-@pytest.mark.dcm2nii
-def test_1_3_check_end2end_uniform(converter_nii):
-    pass
