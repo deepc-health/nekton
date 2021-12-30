@@ -1,67 +1,93 @@
 import os
 from pathlib import Path
+from typing import List
+
+import numpy as np
+import nibabel as nib
+import pydicom
+from pydicom.dataset import FileDataset
+import pydicom_seg
+import SimpleITK as sitk
+
 
 from base import BaseConverter
 from utils.json_helpers import verify_label_dcmqii_json
 
 
-class Nii2Dcm(BaseConverter):
+class Nii2DcmSeg(BaseConverter):
     def __init__(
         self,
         segmentation_map: Path,
-        out_dcm_format: str = "dicomseg",
-        segmentation_type: str = "multiclass",
     ):
-
-        supported_output_formats = ["dicomseg"]
-        if out_dcm_format in supported_output_formats:
-            self.format = out_dcm_format
-        else:
-            raise NotImplementedError(
-                f"""for varaible `out_dcm_format` {out_dcm_format} format not implemented.
-                 Choose one from {supported_output_formats}"""
-            )
-        supported_seg_types = ["multiclass", "multilabel"]
-
-        if segmentation_type in supported_seg_types:
-            self.seg_type = segmentation_type
-        else:
-            raise NotImplementedError(
-                f"""for variable `segmentation_type` {segmentation_type} format not implemented.
-                Choose one from {supported_seg_types}"""
-            )
 
         assert os.path.exists(segmentation_map), "Seg mapping `.json` missing"
 
         assert verify_label_dcmqii_json(
             segmentation_map
         ), "Seg mapping `.json` not confirming to DCIM-QII standard, "
-
+        self.seg_map = pydicom_seg.template.from_dcmqi_metainfo(segmentation_map)
         super().__init__()
 
-    def _dicomseg_multiclass(self):
-        pass
+    def _create_dicomseg(
+        self, segImage: np.ndarray, dcmImage: FileDataset
+    ) -> FileDataset:
+        # add fake storage info
+        appendedImagePosition = False
+        try:
+            dcmImage.ImagePositionPatient
+        except Exception:
+            appendedImagePosition = True
+            dcmImage.ImagePositionPatient = [0, 0, 0]
 
-    def _dicomseg_multilabel(self):
-        pass
+        segImage_itk = sitk.GetImageFromArray(segImage.astype(np.uint8))
 
-    def _gsps_multiclass(self):
-        pass
+        writer = pydicom_seg.MultiClassWriter(
+            template=self.seg_map,
+            inplane_cropping=False,  # Crop image slices to the minimum bounding box on
+            # x and y axes. Maybe not supported by other frameworks.
+            skip_empty_slices=True,  # Don't encode slices with only zeros
+            skip_missing_segment=True,  # If a segment definition is missing in the
+            # template, then raise an error instead of
+            # skipping it.
+        )
 
-    def _gsps_multilabel(self):
-        pass
+        dcmseg = writer.write(segImage_itk, source_images=[dcmImage])
+        dcmseg.AcquisitionTime = dcmImage.AcquisitionTime
+        if appendedImagePosition:
+            dcmseg.ImagePositionPatient = None
 
-    def run(self):
-        if self.format == "dicomseg":
-            if self.seg_type == "multiclass":
-                self._dicomseg_multiclass()
-            elif self.seg_type == "multilabel":
-                self._dicomseg_multilabel()
+        return dcmseg
 
-        elif self.format == "gsps":
-            if self.seg_type == "multiclass":
-                self._gsps_multiclass()
-            elif self.seg_type == "multilabel":
-                self._gsps_multilabel()
+    def _check_all_dicoms(self, dcmfiles: List[Path], seg: np.ndarray) -> List[Path]:
+        assert len(seg.shape[-1]) == len(
+            dcmfiles
+        ), f"""Need 1 DICOM per slice of NifTi;
+        Found {len(dcmfiles)} DICOMS for {len(seg)} NifTi slice"""
+        return dcmfiles
 
-        return 0
+    def multilabel_converter(
+        self, segfiles=List[Path], dcmfiles=List[Path]
+    ) -> List[Path]:
+        # all_individual_segs = [nib.load(file).get_fdata() for file in segfiles]
+        # de-priorisited for now
+
+        raise NotImplementedError(
+            "Multilabel NifTi s to DICOMSeg cannot to be handled yet!!"
+        )
+
+    def multiclass_converter(self, segfile: Path, dcmfiles: List[Path]) -> List[Path]:
+        seg = nib.load(segfile).get_fdata()
+        sorted_dcmfiles = self._check_all_dicoms(dcmfiles, seg)
+        parent_dir = segfile.parent
+        out_folder = os.path.join(parent_dir, "dicomseg")
+        os.makedirs(out_folder)
+        out_list = []
+        for i in range(seg.shape[-1]):
+            dcm_file = sorted_dcmfiles[i]
+            dcm = pydicom.read_file(dcm_file)
+            dcmseg = self._create_dicomseg(seg[..., i], dcm)
+            out_dcmfile = Path(os.path.join(out_folder, dcm_file.name))
+            dcmseg.write(out_dcmfile)
+            out_list.append(out_dcmfile)
+
+        return out_list
