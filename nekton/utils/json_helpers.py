@@ -80,7 +80,5 @@ def verify_label_dcmqii_json(path: str) -> bool:
     validator = _create_validator()
 
     if not validator.is_valid(data):
-        raise NotImplementedError(
-            "This schema not supported! only dcmqi JSON schema supported"
-        )
+        raise TypeError("This schema not supported! only dcmqi JSON schema supported")
     return True

@@ -80,14 +80,17 @@ def test_0_4_check_make_exec_bin():
 
 @pytest.mark.utilstest
 def test_0_4_check_make_run_bin(site_package_path):
+    make_exec_bin()
+
     path_dcms = os.path.join(
         site_package_path, "pydicom/data/test_files/dicomdirtests/98892001/CT5N/"
     )
-    make_exec_bin()
-    run_bin(path_dcms)
     out_path = os.path.join(
         path_dcms, "CT5N_SmartScore_-_Gated_0.5_sec_20010101000000_5.nii.gz"
     )
+    if os.path.exists(out_path):
+        os.remove(out_path)
+    run_bin(path_dcms)
     assert os.path.exists(out_path)
     os.remove(out_path)
 
@@ -119,7 +122,7 @@ def test_0_6_schema_validator():
     # creating a non-conformal json
     dict_data = {"key1": 1, "key2": "a"}
     improper_json = write_json(dict_data, "./test.json")
-    with pytest.raises(NotImplementedError):
+    with pytest.raises(TypeError):
         verify_label_dcmqii_json(improper_json)
     os.remove(improper_json)
 

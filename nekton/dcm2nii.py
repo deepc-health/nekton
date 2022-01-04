@@ -95,6 +95,10 @@ class Dcm2Nii(BaseConverter):
 
         # rename files
         for i, file_path in enumerate(inp_file_list):
+            # name + "_" + "_".join(dcm2niix_suffix[i])
+            # if suffix exists only
+            # fileName_ + sufix1_suffi2
+            # fileName_sufix1_suffi2
             fname = (
                 name + "_" + "_".join(dcm2niix_suffix[i])
                 if len(dcm2niix_suffix[i]) > 0
