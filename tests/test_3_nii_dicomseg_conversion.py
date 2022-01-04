@@ -25,6 +25,8 @@ def test_3_1_check_loading_segmapping(converter_dcmseg):
     with pytest.raises(TypeError):
         converter._load_segmap(nonstd_json)
 
+    os.remove("./test.json")
+
 
 @pytest.mark.nii2dcmseg
 def test_3_2_check_check_all_dicoms(converter_dcmseg, site_package_path):
@@ -74,5 +76,20 @@ def test_3_4_check_multilabel_converter(converter_dcmseg):
 
 
 @pytest.mark.nii2dcmseg
-def test_3_5_check_end2endmulticlass_converter(converter_dcmseg):
-    pass
+def test_3_5_check_end2end_multiclass_converter(site_package_path, converter_dcmseg):
+
+    dir_dcms = os.path.join(
+        site_package_path, "pydicom/data/test_files/dicomdirtests/98892001/CT5N/*"
+    )
+    path_dcms = [path for path in glob.glob(dir_dcms) if ".json" not in path]
+    path_mapping = "tests/test_data/sample_segmentation/mapping.json"
+    path_seg_nifti = "tests/test_data/sample_segmentation/CT5N_segmentation.nii.gz"
+
+    dcmsegs = converter_dcmseg.multiclass_converter(
+        path_seg_nifti, path_mapping, path_dcms
+    )
+
+    assert len(dcmsegs) == 4
+    for dcmseg in dcmsegs:
+        assert os.path.exists(dcmseg)
+        os.remove(dcmseg)

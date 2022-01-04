@@ -114,19 +114,44 @@ class Nii2DcmSeg(BaseConverter):
     def multiclass_converter(
         self, segfile: Path, segMapping: Path, dcmfiles: List[Path]
     ) -> List[Path]:
+        """Convert a given nifti segmentation to dicomseg for multiclass labels
+
+        Args:
+            segfile (Path): path to the nifti segmentation file
+            segMapping (Path): path to the dcmqii format segmentation mapping json
+            dcmfiles (List[Path]): list of paths of all the source dicom files
+
+        Returns:
+            List[Path]: list of paths of all generated dicomseg files
+        """
+        # load the segmentation mapping
+        seg_map = self._load_segmap(segMapping)
+        # load the segmentation and verify if all dicoms exist
         seg = nib.load(segfile).get_fdata()
         sorted_dcmfiles = self._check_all_dicoms(dcmfiles, seg)
-        seg_map = self._load_segmap(segMapping)
-        parent_dir = segfile.parent
+
+        # create folder to store the dicomsegs
+        parent_dir = Path(segfile).parent
         out_folder = os.path.join(parent_dir, "dicomseg")
-        os.makedirs(out_folder)
+        os.makedirs(out_folder, exist_ok=True)
+
+        # list to contain all the output paths of the dicomseg created
+
         out_list = []
-        for i in range(seg.shape[-1]):
-            dcm_file = sorted_dcmfiles[i]
-            dcm = pydicom.read_file(dcm_file)
-            dcmseg = self._create_dicomseg(seg_map, seg[..., i], dcm)
-            out_dcmfile = Path(os.path.join(out_folder, dcm_file.name))
-            dcmseg.write(out_dcmfile)
-            out_list.append(out_dcmfile)
+
+        # create store individual dicomseg
+        for i in range(len(sorted_dcmfiles)):
+
+            # for non-empty segmenetation only
+            non_zero_labels = np.unique(seg[..., i : i + 1]) != 0  # noqa
+            if sum(non_zero_labels) > 0:
+                dcm_file = Path(sorted_dcmfiles[i])
+                dcm = pydicom.read_file(dcm_file)
+                dcmseg = self._create_dicomseg(
+                    seg_map, seg[..., i : i + 1], dcm  # noqa
+                )
+                out_dcmfile = Path(os.path.join(out_folder, dcm_file.name))
+                dcmseg.save_as(out_dcmfile)
+                out_list.append(out_dcmfile)
 
         return out_list
