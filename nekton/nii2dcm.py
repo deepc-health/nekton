@@ -7,6 +7,7 @@ import nibabel as nib
 import pydicom
 from pydicom.dataset import FileDataset, Dataset
 import pydicom_seg
+from pydicom_seg.segmentation_dataset import SegmentationDataset
 import SimpleITK as sitk
 
 
@@ -59,8 +60,18 @@ class Nii2DcmSeg(BaseConverter):
     @staticmethod
     def _create_dicomseg(
         seg_map: Dataset, segImage: np.ndarray, dcmImage: FileDataset
-    ) -> FileDataset:
-        # add fake storage info
+    ) -> SegmentationDataset:
+        """create a dicomseg for storage
+
+        Args:
+            seg_map (Dataset): Dataset info extraced from the mapping json
+            segImage (np.ndarray): a single slice of the segmentation nifti image
+            dcmImage (FileDataset): input dicom to which the dicomseg is to be linked to
+
+        Returns:
+            SegmentationDataset: created dicomseg file
+        """
+        # add fake storage info if necessary
         appendedImagePosition = False
         try:
             dcmImage.ImagePositionPatient
@@ -68,6 +79,7 @@ class Nii2DcmSeg(BaseConverter):
             appendedImagePosition = True
             dcmImage.ImagePositionPatient = [0, 0, 0]
 
+        # convert to itk image
         segImage_itk = sitk.GetImageFromArray(segImage.astype(np.uint8))
 
         writer = pydicom_seg.MultiClassWriter(
@@ -80,7 +92,9 @@ class Nii2DcmSeg(BaseConverter):
             # skipping it.
         )
 
+        # write the image
         dcmseg = writer.write(segImage_itk, source_images=[dcmImage])
+        # correct the acquition time and other info if neccesary
         dcmseg.AcquisitionTime = dcmImage.AcquisitionTime
         if appendedImagePosition:
             dcmseg.ImagePositionPatient = None

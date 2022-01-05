@@ -2,7 +2,9 @@ import pytest
 import os
 import glob
 import nibabel as nib
+import pydicom
 from pydicom.dataset import Dataset
+from pydicom_seg.segmentation_dataset import SegmentationDataset
 from utils.json_helpers import write_json
 
 
@@ -45,8 +47,24 @@ def test_3_2_check_check_all_dicoms(converter_dcmseg, site_package_path):
 
 
 @pytest.mark.nii2dcmseg
-def test_3_3_check_create_dicomseg(converter_dcmseg):
-    pass
+def test_3_3_check_create_dicomseg(site_package_path, converter_dcmseg):
+    mapping = converter_dcmseg._load_segmap(
+        "tests/test_data/sample_segmentation/mapping.json"
+    )
+    seg = nib.load(
+        "tests/test_data/sample_segmentation/CT5N_segmentation.nii.gz"
+    ).get_fdata()[..., -2:-1]
+
+    dir_dcms = os.path.join(
+        site_package_path, "pydicom/data/test_files/dicomdirtests/98892001/CT5N/*"
+    )
+    path_dcm = [path for path in glob.glob(dir_dcms) if ".json" not in path][0]
+    dcm_ds = pydicom.dcmread(path_dcm)
+
+    out_ds = converter_dcmseg._create_dicomseg(mapping, seg, dcm_ds)
+
+    assert type(out_ds) is SegmentationDataset
+    assert dcm_ds.AcquisitionTime == out_ds.AcquisitionTime
 
 
 @pytest.mark.nii2dcmseg
@@ -56,5 +74,5 @@ def test_3_4_check_multilabel_converter(converter_dcmseg):
 
 
 @pytest.mark.nii2dcmseg
-def test_3_5_check_multiclass_converter():
+def test_3_5_check_end2endmulticlass_converter(converter_dcmseg):
     pass
