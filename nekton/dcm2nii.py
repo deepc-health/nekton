@@ -1,6 +1,7 @@
 import glob
 import os
 from typing import List
+from pathlib import Path
 
 import pydicom
 
@@ -18,18 +19,18 @@ class Dcm2Nii(BaseConverter):
         super().__init__()
 
     @staticmethod
-    def get_all_dicoms(dicom_directory: str) -> List[str]:
+    def get_all_dicoms(dicom_directory: Path) -> List[Path]:
         """Class method to read all dicoms in adirectory
 
         Args:
-            dicom_directory (str): the directory where
+            dicom_directory (Path): the directory where
 
         Raises:
             NameError: when the directory does not contain a single dicom
             NameError: when the direcotry does not exist
 
         Returns:
-            List[str]: list of all dicom-paths in the directory
+            List[Path]: list of all dicom-paths in the directory
         """
 
         if not os.path.exists(dicom_directory):
@@ -44,7 +45,9 @@ class Dcm2Nii(BaseConverter):
 
         # check for dicoms only
         dicom_path_list = [
-            file_path for file_path in file_path_list if is_file_a_dicom(file_path)
+            Path(file_path)
+            for file_path in file_path_list
+            if is_file_a_dicom(file_path)
         ]
 
         if len(dicom_path_list) == 0:
@@ -52,11 +55,11 @@ class Dcm2Nii(BaseConverter):
         return dicom_path_list
 
     @staticmethod
-    def check_slice_thickness_variable(all_dcm_paths: List[str]) -> bool:
+    def check_slice_thickness_variable(all_dcm_paths: List[Path]) -> bool:
         """read file header slice thickness to determine if uniform thickness or variable
 
         Args:
-            all_dcm_paths (List[str]): list of path to DICOMs
+            all_dcm_paths (List[Path]): list of path to DICOMs
 
         Returns:
             bool: True if variable slice thickness else False
@@ -66,21 +69,22 @@ class Dcm2Nii(BaseConverter):
         )
         return False if len(all_slice_thickness) == 1 else True
 
-    def _run_conv_variable(self, dicom_directory: str) -> List[str]:
+    def _run_conv_variable(self, dicom_directory: Path) -> List[Path]:
         raise NotImplementedError(
             "DICOM with variable slice thickness cannot to be handled yet!!"
         )
-        return [""]
 
-    def rename_converted_files(self, inp_file_list: List[str], name: str) -> List[str]:
+    def rename_converted_files(
+        self, inp_file_list: List[Path], name: str
+    ) -> List[Path]:
         """Rename a file while preserving the suffix from dcm2niix
 
         Args:
-            inp_file_list (List[str]): list of files to renamed
+            inp_file_list (List[Path]): list of files to renamed
             name (str): new name of the file
 
         Returns:
-            List[str]: list of renamed files
+            List[Path]: list of renamed files
         """
         # preserve all suffixes
         dcm2niix_suffix = [
@@ -91,32 +95,36 @@ class Dcm2Nii(BaseConverter):
 
         # rename files
         for i, file_path in enumerate(inp_file_list):
+            # name + "_" + "_".join(dcm2niix_suffix[i])
+            # if suffix exists only
+            # fileName_ + sufix1_suffi2
+            # fileName_sufix1_suffi2
             fname = (
                 name + "_" + "_".join(dcm2niix_suffix[i])
                 if len(dcm2niix_suffix[i]) > 0
                 else name
             )
-            out_file_list.append(rename_file(file_path, fname))
+            out_file_list.append(rename_file(str(file_path), fname))
         return out_file_list
 
-    def _run_conv_uniform(self, dicom_directory: str) -> List[str]:
+    def _run_conv_uniform(self, dicom_directory: Path) -> List[Path]:
         """run the binary on the input directory
 
         Args:
-            dicom_directory (str): directory of the dicoms
+            dicom_directory (Path): directory of the dicoms
 
         Returns:
-            List[str]: output NifTi files post conversion
+            List[Path]: output NifTi files post conversion
         """
         self.run_bin(dicom_directory)
-        output_files = glob.glob(os.path.join(dicom_directory, "*.nii*"))
+        output_files = list(Path(dicom_directory).glob("*.nii*"))
         return output_files
 
-    def run(self, dicom_directory: str, name: str = "") -> List[str]:
+    def run(self, dicom_directory: Path, name: str = "") -> List[Path]:
         """Run the dcm to nifti conversion in a directory
 
         Args:
-            dicom_directory (str): path to directory with Dicoms
+            dicom_directory (Path): path to directory with Dicoms
             name (str, optional): Name to be given to the output file. Defaults to "".
 
         Raises:
@@ -125,7 +133,7 @@ class Dcm2Nii(BaseConverter):
             RuntimeError: Renaming error
 
         Returns:
-            List[str]: output list of Nifti files
+            List[Path]: output list of Nifti files
         """
         try:
             all_dcm_paths = self.get_all_dicoms(dicom_directory)

@@ -3,7 +3,10 @@ import os
 import json
 import subprocess
 
-from utils.json_helpers import read_json, write_json
+from os.path import abspath
+from os.path import dirname as d
+
+from utils.json_helpers import read_json, write_json, verify_label_dcmqii_json
 from utils.dicom import is_file_a_dicom
 from utils.bin import make_exec_bin, run_bin
 from utils.fileops import rename_file
@@ -77,14 +80,17 @@ def test_0_4_check_make_exec_bin():
 
 @pytest.mark.utilstest
 def test_0_4_check_make_run_bin(site_package_path):
+    make_exec_bin()
+
     path_dcms = os.path.join(
         site_package_path, "pydicom/data/test_files/dicomdirtests/98892001/CT5N/"
     )
-    make_exec_bin()
-    run_bin(path_dcms)
     out_path = os.path.join(
         path_dcms, "CT5N_SmartScore_-_Gated_0.5_sec_20010101000000_5.nii.gz"
     )
+    if os.path.exists(out_path):
+        os.remove(out_path)
+    run_bin(path_dcms)
     assert os.path.exists(out_path)
     os.remove(out_path)
 
@@ -103,3 +109,24 @@ def test_0_5_rename_file():
     # passing file that does not exist
     with pytest.raises(RuntimeError):
         rename_file(out_path, "not_so_trial")
+
+
+@pytest.mark.utilstest
+def test_0_6_schema_validator():
+    # conformal json
+    proper_json = os.path.join(
+        d(d(abspath(__file__))), "nekton/externals/dcmqi/doc/examples/seg-example.json"
+    )
+    assert verify_label_dcmqii_json(proper_json)
+
+    # creating a non-conformal json
+    dict_data = {"key1": 1, "key2": "a"}
+    improper_json = write_json(dict_data, "./test.json")
+    with pytest.raises(TypeError):
+        verify_label_dcmqii_json(improper_json)
+    os.remove(improper_json)
+
+    # this path does not exist
+    not_existing_json = "./not-existing.json"
+    with pytest.raises(NameError):
+        verify_label_dcmqii_json(not_existing_json)
