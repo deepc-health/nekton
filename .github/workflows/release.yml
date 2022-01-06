@@ -58,7 +58,5 @@ jobs:
           git config user.name github-actions
           git config user.email github-actions@github.com
           semantic-release publish
-      - name: Push to package to PyPI
-        run: |
-         pip install poetry
-         poetry publish --build --username ${{ secrets.PYPI_USER }} --password ${{ secrets.PYPI_SECRET }}
+
+      
