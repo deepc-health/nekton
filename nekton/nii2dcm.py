@@ -1,6 +1,6 @@
 import os
 from pathlib import Path
-from typing import List
+from typing import List, Union
 
 import numpy as np
 import nibabel as nib
@@ -89,25 +89,22 @@ class Nii2DcmSeg(BaseConverter):
 
     @staticmethod
     def _create_dicomseg(
-        seg_map: Dataset, segImage: np.ndarray, dcmImage: FileDataset
+        seg_map: Dataset,
+        segImage: np.ndarray,
+        dcmImage: Union[FileDataset, List[FileDataset]],
     ) -> SegmentationDataset:
         """create a dicomseg for storage
 
         Args:
             seg_map (Dataset): Dataset info extraced from the mapping json
             segImage (np.ndarray): a single slice of the segmentation nifti image
-            dcmImage (FileDataset): input dicom to which the dicomseg is to be linked to
+            dcmImage (Union[FileDataset,List[FileDataset]]): input dicom to which
+             the dicomseg is to be linked to, if a list a multilayer dicomseg will
+             be created, else a single dicomseg for a single layer will be created
 
         Returns:
             SegmentationDataset: created dicomseg file
         """
-        # add fake storage info if necessary
-        appendedImagePosition = False
-        try:
-            dcmImage.ImagePositionPatient
-        except Exception:
-            appendedImagePosition = True
-            dcmImage.ImagePositionPatient = [0, 0, 0]
 
         # convert to itk image
         segImage_itk = sitk.GetImageFromArray(segImage.astype(np.uint8))
@@ -122,56 +119,51 @@ class Nii2DcmSeg(BaseConverter):
             # skipping it.
         )
 
-        # write the image
-        dcmseg = writer.write(segImage_itk, source_images=[dcmImage])
-        # correct the acquition time and other info if neccesary
-        dcmseg.AcquisitionTime = dcmImage.AcquisitionTime
+        # add fake storage info if necessary
+        appendedImagePosition = False
+        if type(dcmImage) == FileDataset:
+            try:
+                dcmImage.ImagePositionPatient
+            except Exception:
+                appendedImagePosition = True
+                dcmImage.ImagePositionPatient = [0, 0, 0]
+            # write the image
+            dcmseg = writer.write(segImage_itk, source_images=[dcmImage])
+
+            # correct the acquition time and other info if neccesary
+            dcmseg.AcquisitionTime = dcmImage.AcquisitionTime
+        elif type(dcmImage) == list:
+            dcmseg = writer.write(segImage_itk, source_images=dcmImage)
+            # correct the acquition time and other info if neccesary
+            dcmseg.AcquisitionTime = dcmImage[0].AcquisitionTime
+
         if appendedImagePosition:
             dcmseg.ImagePositionPatient = None
 
         return dcmseg
 
-    def multilabel_converter(
-        self, segfiles=List[Path], dcmfiles=List[Path]
+    def _store_singlelayer_dicomseg(
+        self,
+        sorted_dcmfiles: List[Path],
+        seg_map: Dataset,
+        seg: np.ndarray,
+        out_folder: Path,
     ) -> List[Path]:
-        # all_individual_segs = [nib.load(file).get_fdata() for file in segfiles]
-        # de-priorisited for now
-
-        raise NotImplementedError(
-            "Multilabel NifTi s to DICOMSeg cannot to be handled yet!!"
-        )
-
-    def multiclass_converter(
-        self, segfile: Path, segMapping: Path, dcmfiles: List[Path]
-    ) -> List[Path]:
-        """Convert a given nifti segmentation to dicomseg for multiclass segmentations
+        """stores each individual layer as a single dcm
 
         Args:
-            segfile (Path): path to the nifti segmentation file
-            segMapping (Path): path to the dcmqii format segmentation mapping json
-            dcmfiles (List[Path]): list of paths of all the source dicom files
+            sorted_dcmfiles (List[Path]): list of paths of all the source
+             dicom files sorted by z-axis
+            seg_map (Dataset): Dataset info extraced from the mapping json
+            seg (np.ndarray): numpy array from a  segmentation nifti image
+            out_folder (Path): path to folder to store the output to
 
         Returns:
-            List[Path]: list of paths of all generated dicomseg files
+            List[Path]: path to each individual dcm
         """
-        # load the segmentation mapping
-        seg_map = self._load_segmap(segMapping)
-        # load the segmentation and verify if all dicoms exist
-        seg = nib.load(segfile).get_fdata()
-        sorted_dcmfiles = self._check_all_dicoms(dcmfiles, seg)
-
-        self._check_all_lables(seg_map, seg)
-
-        # create folder to store the dicomsegs
-        parent_dir = Path(segfile).parent
-        out_folder = os.path.join(parent_dir, "dicomseg")
-        os.makedirs(out_folder, exist_ok=True)
-
         # list to contain all the output paths of the dicomseg created
-
         out_list = []
 
-        # create store individual dicomseg
         for i in range(len(sorted_dcmfiles)):
 
             # for non-empty segmenetation only
@@ -185,5 +177,85 @@ class Nii2DcmSeg(BaseConverter):
                 out_dcmfile = Path(os.path.join(out_folder, dcm_file.name))
                 dcmseg.save_as(out_dcmfile)
                 out_list.append(out_dcmfile)
+
+        return out_list
+
+    def _store_multilayer_dicomseg(
+        self,
+        sorted_dcmfiles: List[Path],
+        seg_map: Dataset,
+        seg: np.ndarray,
+        out_folder: Path,
+    ) -> List[Path]:
+        """stores all individual layer as a single multilayer dcm
+
+        Args:
+            sorted_dcmfiles (List[Path]): list of paths of all the source
+             dicom files sorted by z-axis
+            seg_map (Dataset): Dataset info extraced from the mapping json
+            seg (np.ndarray): numpy array from a  segmentation nifti image
+            out_folder (Path): path to folder to store the output to
+
+        Returns:
+            List[Path]: path to dcmseg
+        """
+        sorted_dcm = [pydicom.read_file(dcm_file) for dcm_file in sorted_dcmfiles]
+        dcmseg = self._create_dicomseg(seg_map, seg, sorted_dcm)
+        out_dcmfile = Path(os.path.join(out_folder, Path(sorted_dcmfiles[0]).name))
+        dcmseg.save_as(out_dcmfile)
+
+        return [out_dcmfile]
+
+    def multilabel_converter(
+        self, segfiles=List[Path], dcmfiles=List[Path]
+    ) -> List[Path]:
+        # all_individual_segs = [nib.load(file).get_fdata() for file in segfiles]
+        # de-priorisited for now
+
+        raise NotImplementedError(
+            "Multilabel NifTi s to DICOMSeg cannot to be handled yet!!"
+        )
+
+    def multiclass_converter(
+        self,
+        segfile: Path,
+        segMapping: Path,
+        dcmfiles: List[Path],
+        multiLayer: bool = False,
+    ) -> List[Path]:
+        """Convert a given nifti segmentation to dicomseg for multiclass segmentations
+
+        Args:
+            segfile (Path): path to the nifti segmentation file
+            segMapping (Path): path to the dcmqii format segmentation mapping json
+            dcmfiles (List[Path]): list of paths of all the source dicom files
+            multiLayer (bool, optional): create a single multilayer dicomseg. Defaults to False.
+
+        Returns:
+            List[Path]: list of paths of all generated dicomseg files
+        """
+
+        # load the segmentation mapping
+        seg_map = self._load_segmap(segMapping)
+        # load the segmentation and verify if all dicoms exist
+        seg = nib.load(segfile).get_fdata()
+        sorted_dcmfiles = self._check_all_dicoms(dcmfiles, seg)
+
+        self._check_all_lables(seg_map, seg)
+
+        # create folder to store the dicomsegs
+        parent_dir = Path(segfile).parent
+        out_folder = Path(os.path.join(parent_dir, "dicomseg"))
+        os.makedirs(out_folder, exist_ok=True)
+
+        # create store individual dicomseg
+        if multiLayer:
+            out_list = self._store_multilayer_dicomseg(
+                sorted_dcmfiles, seg_map, seg, out_folder
+            )
+        else:
+            out_list = self._store_singlelayer_dicomseg(
+                sorted_dcmfiles, seg_map, seg, out_folder
+            )
 
         return out_list

@@ -76,7 +76,9 @@ def test_3_4_check_multilabel_converter(converter_dcmseg):
 
 
 @pytest.mark.nii2dcmseg
-def test_3_5_check_end2end_multiclass_converter(site_package_path, converter_dcmseg):
+def test_3_7_check_end2end_multiclass_singlelayer_converter(
+    site_package_path, converter_dcmseg
+):
 
     dir_dcms = os.path.join(
         site_package_path, "pydicom/data/test_files/dicomdirtests/98892001/CT5N/*"
@@ -90,6 +92,28 @@ def test_3_5_check_end2end_multiclass_converter(site_package_path, converter_dcm
     )
 
     assert len(dcmsegs) == 4
+    for dcmseg in dcmsegs:
+        assert os.path.exists(dcmseg)
+        os.remove(dcmseg)
+
+
+@pytest.mark.nii2dcmseg
+def test_3_5_check_end2end_multiclass_multilayer_converter(
+    site_package_path, converter_dcmseg
+):
+
+    dir_dcms = os.path.join(
+        site_package_path, "pydicom/data/test_files/dicomdirtests/98892001/CT5N/*"
+    )
+    path_dcms = [path for path in glob.glob(dir_dcms) if ".json" not in path]
+    path_mapping = "tests/test_data/sample_segmentation/mapping.json"
+    path_seg_nifti = "tests/test_data/sample_segmentation/CT5N_segmentation.nii.gz"
+
+    dcmsegs = converter_dcmseg.multiclass_converter(
+        path_seg_nifti, path_mapping, path_dcms, multiLayer=True
+    )
+
+    assert len(dcmsegs) == 1
     for dcmseg in dcmsegs:
         assert os.path.exists(dcmseg)
         os.remove(dcmseg)
