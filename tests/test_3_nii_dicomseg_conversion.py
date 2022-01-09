@@ -93,3 +93,21 @@ def test_3_5_check_end2end_multiclass_converter(site_package_path, converter_dcm
     for dcmseg in dcmsegs:
         assert os.path.exists(dcmseg)
         os.remove(dcmseg)
+
+
+@pytest.mark.nii2dcmseg
+def test_3_6_check_check_all_labels(converter_dcmseg):
+    mapping = converter_dcmseg._load_segmap(
+        "tests/test_data/sample_segmentation/mapping.json"
+    )
+    fake_mapping = converter_dcmseg._load_segmap(
+        "tests/test_data/sample_segmentation/fake_mapping.json"
+    )
+    seg = nib.load(
+        "tests/test_data/sample_segmentation/CT5N_segmentation.nii.gz"
+    ).get_fdata()
+
+    with pytest.raises(ValueError):
+        converter_dcmseg._check_all_lables(fake_mapping, seg)
+
+    converter_dcmseg._check_all_lables(mapping, seg)

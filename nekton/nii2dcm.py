@@ -58,6 +58,36 @@ class Nii2DcmSeg(BaseConverter):
         return self.sort_order(z_locs, dcmfiles)
 
     @staticmethod
+    def _check_all_lables(seg_map: Dataset, segImage: np.ndarray):
+        """Check the integrity of the labels in the segmentation and the mapping provided in the json
+
+        Args:
+            seg_map (Dataset): mapping extracted from the corresponding json
+            segImage (np.ndarray): 3d nifti segmentation
+
+        Raises:
+            ValueError: the segmentation is not found in the json
+        """
+        total_unique_segs = [
+            seg for seg in list(np.unique(np.uint8(segImage))) if seg != 0
+        ]
+
+        assert len(seg_map.SegmentSequence) >= len(
+            total_unique_segs
+        ), "Not all the segmentation have a mapping in the json"
+        # check all individual labels exist
+        max_length_seq = len(seg_map.SegmentSequence)
+        all_seq = [
+            seg_map.SegmentSequence[i].SegmentNumber for i in range(max_length_seq)
+        ]
+        for seg in total_unique_segs:
+            found = seg in all_seq
+            if not found:
+                raise ValueError(
+                    f"No Segmentation mapping found for label {seg} in json"
+                )
+
+    @staticmethod
     def _create_dicomseg(
         seg_map: Dataset, segImage: np.ndarray, dcmImage: FileDataset
     ) -> SegmentationDataset:
@@ -114,7 +144,7 @@ class Nii2DcmSeg(BaseConverter):
     def multiclass_converter(
         self, segfile: Path, segMapping: Path, dcmfiles: List[Path]
     ) -> List[Path]:
-        """Convert a given nifti segmentation to dicomseg for multiclass labels
+        """Convert a given nifti segmentation to dicomseg for multiclass segmentations
 
         Args:
             segfile (Path): path to the nifti segmentation file
@@ -129,6 +159,8 @@ class Nii2DcmSeg(BaseConverter):
         # load the segmentation and verify if all dicoms exist
         seg = nib.load(segfile).get_fdata()
         sorted_dcmfiles = self._check_all_dicoms(dcmfiles, seg)
+
+        self._check_all_lables(seg_map, seg)
 
         # create folder to store the dicomsegs
         parent_dir = Path(segfile).parent
