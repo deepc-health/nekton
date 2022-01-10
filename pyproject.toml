@@ -3,7 +3,10 @@ name = "nekton"
 version = "0.1.0"
 description = "A python package for DICOM to NifTi and NifTi to DICOM-SEG and GSPS conversion"
 authors = ["a-parida12 <abhijeet@deepc.ai>"]
-license = "MIT License"
+license = "MIT"
+repository = 'https://github.com/deepc-health/nekton'
+readme = 'README.md'
+keywords = ["dicom", "medical-imaging", "nifti",  "dicom-seg", "gsps"]
 
 [tool.poetry.dependencies]
 python = "^3.8"
@@ -30,6 +33,6 @@ version_variable = [
     "pyproject.toml:version"
 ]
 branch = "main"
-upload_to_pypi = false
+upload_to_pypi = true
 upload_to_release = true
 build_command = "pip install poetry && poetry build"
