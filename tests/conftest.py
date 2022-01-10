@@ -9,6 +9,7 @@ from os.path import dirname as d
 parent_dir = f"{d(d(abspath(__file__)))}"
 sys.path.append(f"{parent_dir}/nekton")
 from dcm2nii import Dcm2Nii  # noqa
+from nii2dcm import Nii2DcmSeg  # noqa
 
 
 @pytest.fixture
@@ -19,3 +20,8 @@ def site_package_path():
 @pytest.fixture
 def converter_nii():
     yield Dcm2Nii()
+
+
+@pytest.fixture
+def converter_dcmseg():
+    yield Nii2DcmSeg()
