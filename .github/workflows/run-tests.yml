@@ -27,6 +27,7 @@ jobs:
     
     - name: Security Analysis with bandit
       run: |
+        mkdir ci-logs
         poetry run bandit -r -lll -x ./venv -f txt -o ci-logs/bandit.log .
 
     - name: Submodules Setup
