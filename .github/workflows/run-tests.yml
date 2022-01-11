@@ -17,6 +17,7 @@ jobs:
         python -m pip install --upgrade pip
         pip install flake8 pytest pytest-cov
         pip install poetry && poetry build
+        poetry install
         
     - name: Lint with flake8
       run: |
