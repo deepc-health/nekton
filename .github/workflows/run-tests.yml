@@ -29,6 +29,12 @@ jobs:
       run: |
         mkdir ci-logs
         poetry run bandit -r -lll  -f txt -o ci-logs/bandit.log ./nekton ./tests
+        
+    - name: Archive bandit report
+      uses: actions/upload-artifact@v2
+      with:
+        name: bandit-report
+        path: ci-logs/bandit.log
 
     - name: Submodules Setup
       uses: actions/checkout@v2
@@ -52,8 +58,4 @@ jobs:
         name: code-coverage-report
         path: htmlcov/index.html
 
-    - name: Archive bandit report
-      uses: actions/upload-artifact@v2
-      with:
-        name: bandit-report
-        path: ci-logs/bandit.log
+    
