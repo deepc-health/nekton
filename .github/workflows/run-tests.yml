@@ -17,8 +17,7 @@ jobs:
         python -m pip install --upgrade pip
         pip install poetry && poetry build
         poetry install
-        
-        
+         
     - name: Lint with flake8
       run: |
         # stop the build if there are Python syntax errors or undefined names
@@ -26,6 +25,10 @@ jobs:
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
         poetry run flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     
+    - name: Security Analysis with bandit
+      run: |
+        poetry run bandit -r -lll -x ./venv -f txt -o ci-logs/bandit.log .
+
     - name: Submodules Setup
       uses: actions/checkout@v2
       with:
@@ -47,3 +50,9 @@ jobs:
       with:
         name: code-coverage-report
         path: htmlcov/index.html
+
+    - name: Archive bandit report
+      uses: actions/upload-artifact@v2
+      with:
+        name: bandit-report
+        path: ci-logs/bandit.log
