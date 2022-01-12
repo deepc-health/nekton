@@ -25,6 +25,10 @@ jobs:
     - name: Install dependencies
       run: |
         python -m poetry install
+    - name: Submodules Setup
+      uses: actions/checkout@v2
+      with:
+        submodules: recursive
     - name: Lint with flake8
       run: |
         # stop the build if there are Python syntax errors or undefined names
