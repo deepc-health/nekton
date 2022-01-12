@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "nekton"
-version = "0.1.0"
+version = "0.1.1"
 description = "A python package for DICOM to NifTi and NifTi to DICOM-SEG and GSPS conversion"
 authors = ["a-parida12 <abhijeet@deepc.ai>"]
 license = "MIT"
