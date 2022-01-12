@@ -98,7 +98,8 @@ def test_0_4_check_make_run_bin(site_package_path):
 @pytest.mark.utilstest
 def test_0_5_rename_file():
     file_path = "./trial.txt"
-    subprocess.run(f"touch {file_path}", shell=True, universal_newlines=True)
+    with open(file_path, "w"):
+        pass
     assert os.path.exists(file_path)
 
     out_path = rename_file(file_path, "not_so_trial")

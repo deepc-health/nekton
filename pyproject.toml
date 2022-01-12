@@ -1,0 +1,38 @@
+[tool.poetry]
+name = "nekton"
+version = "0.1.0"
+description = "A python package for DICOM to NifTi and NifTi to DICOM-SEG and GSPS conversion"
+authors = ["a-parida12 <abhijeet@deepc.ai>"]
+license = "MIT"
+repository = 'https://github.com/deepc-health/nekton'
+readme = 'README.md'
+keywords = ["dicom", "medical-imaging", "nifti",  "dicom-seg", "gsps"]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+jsonschema = "^3.2.0"
+nibabel = "^3.2.1"
+numpy = "^1.22.0"
+pydicom = "^2.2.2"
+pydicom-seg = "^0.4.0"
+
+[tool.poetry.dev-dependencies]
+pytest = "^6.2.5"
+flake8 = "^4.0.1"
+pytest-cov = "^3.0.0"
+commitizen = "^2.20.3"
+bandit = "^1.7.1"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.semantic_release]
+version_variable = [
+    "nekton/__init__.py:__version__",
+    "pyproject.toml:version"
+]
+branch = "main"
+upload_to_pypi = true
+upload_to_release = true
+build_command = "pip install poetry && poetry build"
