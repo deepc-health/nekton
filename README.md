@@ -11,7 +11,7 @@ The DICOM to NifTi conversion in the package is based on a wrapper around the [d
 
 ### Usage
 
-TBD
+
 
 ### Notes
 
