@@ -6,10 +6,10 @@ import subprocess
 from os.path import abspath
 from os.path import dirname as d
 
-from utils.json_helpers import read_json, write_json, verify_label_dcmqii_json
-from utils.dicom import is_file_a_dicom
-from utils.bin import make_exec_bin, run_bin
-from utils.fileops import rename_file
+from nekton.utils.json_helpers import read_json, write_json, verify_label_dcmqii_json
+from nekton.utils.dicom import is_file_a_dicom
+from nekton.utils.bin import make_exec_bin, run_bin
+from nekton.utils.fileops import rename_file
 
 
 @pytest.mark.utilstest

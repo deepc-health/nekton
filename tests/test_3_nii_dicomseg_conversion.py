@@ -5,7 +5,7 @@ import nibabel as nib
 import pydicom
 from pydicom.dataset import Dataset
 from pydicom_seg.segmentation_dataset import SegmentationDataset
-from utils.json_helpers import write_json
+from nekton.utils.json_helpers import write_json
 
 
 @pytest.mark.nii2dcmseg

@@ -7,9 +7,9 @@ from os.path import abspath
 from os.path import dirname as d
 
 parent_dir = f"{d(d(abspath(__file__)))}"
-sys.path.append(f"{parent_dir}/nekton")
-from dcm2nii import Dcm2Nii  # noqa
-from nii2dcm import Nii2DcmSeg  # noqa
+sys.path.append(f"{parent_dir}")
+from nekton.dcm2nii import Dcm2Nii  # noqa
+from nekton.nii2dcm import Nii2DcmSeg  # noqa
 
 
 @pytest.fixture

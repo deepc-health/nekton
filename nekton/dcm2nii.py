@@ -5,11 +5,11 @@ from pathlib import Path
 
 import pydicom
 
-from utils.dicom import is_file_a_dicom
-from utils.bin import make_exec_bin, run_bin
-from utils.fileops import rename_file
+from .utils.dicom import is_file_a_dicom
+from .utils.bin import make_exec_bin, run_bin
+from .utils.fileops import rename_file
 
-from base import BaseConverter
+from .base import BaseConverter
 
 
 class Dcm2Nii(BaseConverter):
@@ -125,7 +125,7 @@ class Dcm2Nii(BaseConverter):
 
         Args:
             dicom_directory (Path): path to directory with Dicoms
-            name (str, optional): Name to be given to the output file. Defaults to "".
+            name (str, optional): Name to be given to the output file. Defaults to standard name.
 
         Raises:
             RuntimeError: Parsing dicom error

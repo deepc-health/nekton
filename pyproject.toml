@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "nekton"
-version = "0.1.0"
+version = "0.2.0"
 description = "A python package for DICOM to NifTi and NifTi to DICOM-SEG and GSPS conversion"
 authors = ["a-parida12 <abhijeet@deepc.ai>"]
 license = "MIT"
@@ -32,7 +32,7 @@ version_variable = [
     "nekton/__init__.py:__version__",
     "pyproject.toml:version"
 ]
-branch = "main"
+branch = "master"
 upload_to_pypi = true
 upload_to_release = true
 build_command = "pip install poetry && poetry build"
