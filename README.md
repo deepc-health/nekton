@@ -41,6 +41,7 @@ Returns:
 
 - `List[Path]`: output list of Nifti files
 
+
 ### Notes
 
 - The renaming functionality retains the [suffixes](https://github.com/rordenlab/dcm2niix/blob/master/FILENAMING.md) from the original program.
