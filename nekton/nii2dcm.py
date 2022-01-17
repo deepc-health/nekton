@@ -11,8 +11,8 @@ from pydicom_seg.segmentation_dataset import SegmentationDataset
 import SimpleITK as sitk
 
 
-from base import BaseConverter
-from utils.json_helpers import verify_label_dcmqii_json
+from .base import BaseConverter
+from .utils.json_helpers import verify_label_dcmqii_json
 
 
 class Nii2DcmSeg(BaseConverter):

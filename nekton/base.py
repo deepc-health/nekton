@@ -1,4 +1,4 @@
-from utils.json_helpers import write_json
+from .utils.json_helpers import write_json
 import os
 from pathlib import Path
 from typing import List
