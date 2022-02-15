@@ -35,7 +35,7 @@ print(converted_files)
 Parameters `converter.run`:
 
 - `dicom_directory (Path)`: path to directory with Dicoms
-- `name` (str, optional)`: Name to be given to the output file. Defaults to "".
+- `name (str, optional)`: Name to be given to the output file. Defaults to "".
 
 Returns:
 
