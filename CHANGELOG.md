@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.2.2 (2022-04-11)
+### Fix
+* **python-version:** Now python version 3.6.9 supported ([`b4ab299`](https://github.com/deepc-health/nekton/commit/b4ab299ec2344c82bff09ab73861dbe45202ea32))
+
 ## v0.2.1 (2022-02-15)
 ### Fix
 * **documentation:** Aaded improved docs ([`3017be0`](https://github.com/deepc-health/nekton/commit/3017be072fe6f20708ac5d7a4cf07d888752883b))
