@@ -14,7 +14,7 @@ jsonschema = "^3.2.0"
 nibabel = "^3.2.1"
 numpy = "^1.22.0"
 pydicom = "^2.2.2"
-pydicom-seg = "^0.4.0"
+pydicom-seg = "^0.3.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2.5"
