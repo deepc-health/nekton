@@ -1,5 +1,6 @@
 # Nekton
 [![Python Application Testing](https://github.com/deepc-health/nekton/actions/workflows/tests.yml/badge.svg?branch=master)](https://github.com/deepc-health/nekton/actions/workflows/tests.yml)[![Test and Release](https://github.com/deepc-health/nekton/actions/workflows/release.yml/badge.svg?branch=master)](https://github.com/deepc-health/nekton/actions/workflows/release.yml)
+[![Python Versions](https://img.shields.io/pypi/pyversions/nekton.svg)](https://pypi.org/project/nekton/)[![Package version](https://img.shields.io/pypi/v/nekton?color=%2334D058&label=pypi%20package)](https://pypi.org/project/nekton/)
 
 > A python package for DICOM to NifTi and NifTi to DICOM-SEG and GSPS conversion
 
