@@ -510,7 +510,7 @@ testing = ["pytest (>=4.6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytes
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.6.9"
-content-hash = "39b7e1a916083c99ceac3bfa3899c9f89515bfe02ae6c69532a3232c0b1a2d18"
+content-hash = "03016a731b4338d4b511b6c21ef5dd38cc463d7f32a194e2ca478c6defb0c173"
 
 [metadata.files]
 argcomplete = [
