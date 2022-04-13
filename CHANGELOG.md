@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.2.3 (2022-04-13)
+### Fix
+* **missingfolder:** Added external submodule ([`dcdd7cb`](https://github.com/deepc-health/nekton/commit/dcdd7cbd33d2078bec0e3817bf46e6ddf773de8d))
+
 ## v0.2.2 (2022-04-11)
 ### Fix
 * **python-version:** Now python version 3.6.9 supported ([`b4ab299`](https://github.com/deepc-health/nekton/commit/b4ab299ec2344c82bff09ab73861dbe45202ea32))
