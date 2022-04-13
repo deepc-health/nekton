@@ -48,8 +48,8 @@ class Nii2DcmSeg(BaseConverter):
         Returns:
             List[Path]: sorted list of dicoms based on the order
         """
-        assert seg.shape[-1] == len(
-            dcmfiles
+        assert len(dcmfiles) in list(
+            seg.shape
         ), f"""Need 1 DICOM per slice of NifTi;
         Found {len(dcmfiles)} DICOMS for {len(seg)} NifTi slice"""
 
