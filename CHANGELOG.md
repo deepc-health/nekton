@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.2.4 (2022-04-13)
+### Fix
+* **nii2dcm:** Fixed check for the number of dicom ([#21](https://github.com/deepc-health/nekton/issues/21)) ([`c3ec65d`](https://github.com/deepc-health/nekton/commit/c3ec65d9c2ee61709a4fd8ed80a2fb7d7cf43fcf))
+
 ## v0.2.3 (2022-04-13)
 ### Fix
 * **missingfolder:** Added external submodule ([`dcdd7cb`](https://github.com/deepc-health/nekton/commit/dcdd7cbd33d2078bec0e3817bf46e6ddf773de8d))
