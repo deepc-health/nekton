@@ -117,6 +117,8 @@ class Dcm2Nii(BaseConverter):
             List[Path]: output NifTi files post conversion
         """
         self.run_bin(dicom_directory, out_directory)
+        if out_directory is not None:
+            dicom_directory = out_directory
         output_files = list(Path(dicom_directory).glob("*.nii*"))
         return output_files
 
@@ -158,7 +160,7 @@ class Dcm2Nii(BaseConverter):
                 raise RuntimeError(f"Error renaming output NifTi: {err}")
 
         print(
-            f"\nConverted {len(all_dcm_paths)} DCM to Nifti; Output stored @ {dicom_directory}\n"
+            f"\nConverted {len(all_dcm_paths)} DCM to Nifti; Output stored @ {converted_file_paths[0].parent}\n"
         )
 
         return converted_file_paths
