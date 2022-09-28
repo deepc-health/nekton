@@ -51,7 +51,7 @@ def test_2_3_check_end2end_uniform_rename(converter_nii, site_package_path):
 
     # rename fail
     with pytest.raises(RuntimeError):
-        converter_nii.run(path_dcms, None)
+        converter_nii.run(path_dcms, None, None)
     os.remove(
         os.path.join(
             site_package_path,
@@ -76,5 +76,5 @@ def test_2_4_check_store_new_loc(converter_nii, site_package_path):
     out_dir = "pydicom/data/test_files/"
     output_paths = converter_nii.run(path_dcms, out_dir)
     assert len(output_paths) == 1
-    assert out_dir in output_paths[0]
+    assert out_dir in str(output_paths[0])
     [os.remove(path) for path in output_paths]
