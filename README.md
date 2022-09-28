@@ -27,7 +27,7 @@ The DICOM to NifTi conversion in the package is based on a wrapper around the [d
 ```python
 from nekton.dcm2nii import Dcm2Nii
 converter = Dcm2Nii()
-converted_files = converter.run(dicom_directory='/test_files/CT5N', name='Test')
+converted_files = converter.run(dicom_directory='/test_files/CT5N',  out_directory='/test_files/CT5N', name='Test')
 # Converted 5 DCM to Nifti; Output stored @ /test_files/CT5N
 print(converted_files)
 # ['/test_files/CT5N/Test_SmartScore_-_Gated_0.5_sec_20010101000000_5.nii.gz']
@@ -36,6 +36,7 @@ print(converted_files)
 Parameters `converter.run`:
 
 - `dicom_directory (Path)`: path to directory with Dicoms
+- `dicom_directory (Path, optional)`: directory to store the output nifti
 - `name (str, optional)`: Name to be given to the output file. Defaults to "".
 
 Returns:
