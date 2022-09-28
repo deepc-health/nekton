@@ -69,7 +69,7 @@ class Dcm2Nii(BaseConverter):
         )
         return False if len(all_slice_thickness) == 1 else True
 
-    def _run_conv_variable(self, dicom_directory: Path) -> List[Path]:
+    def _run_conv_variable(self, dicom_directory: Path, out_directory: Path) -> List[Path]:
         raise NotImplementedError(
             "DICOM with variable slice thickness cannot to be handled yet!!"
         )
@@ -107,7 +107,7 @@ class Dcm2Nii(BaseConverter):
             out_file_list.append(rename_file(str(file_path), fname))
         return out_file_list
 
-    def _run_conv_uniform(self, dicom_directory: Path) -> List[Path]:
+    def _run_conv_uniform(self, dicom_directory: Path, out_directory:Path) -> List[Path]:
         """run the binary on the input directory
 
         Args:
@@ -116,15 +116,16 @@ class Dcm2Nii(BaseConverter):
         Returns:
             List[Path]: output NifTi files post conversion
         """
-        self.run_bin(dicom_directory)
+        self.run_bin(dicom_directory, out_directory)
         output_files = list(Path(dicom_directory).glob("*.nii*"))
         return output_files
 
-    def run(self, dicom_directory: Path, name: str = "") -> List[Path]:
+    def run(self, dicom_directory: Path, out_directory:Path=None, name: str = "") -> List[Path]:
         """Run the dcm to nifti conversion in a directory
 
         Args:
             dicom_directory (Path): path to directory with Dicoms
+            dicom_directory (Path, optional): directory to store the nifti
             name (str, optional): Name to be given to the output file. Defaults to standard name.
 
         Raises:
@@ -142,9 +143,9 @@ class Dcm2Nii(BaseConverter):
 
         try:
             if self.check_slice_thickness_variable(all_dcm_paths):
-                converted_file_paths = self._run_conv_variable(dicom_directory)
+                converted_file_paths = self._run_conv_variable(dicom_directory, out_directory)
             else:
-                converted_file_paths = self._run_conv_uniform(dicom_directory)
+                converted_file_paths = self._run_conv_uniform(dicom_directory, out_directory)
         except Exception as err:
             raise RuntimeError(f"Error converting DCM to NifTi: {err}")
 
