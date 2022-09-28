@@ -79,5 +79,5 @@ def test_2_4_check_store_new_loc(converter_nii, site_package_path):
 
     output_paths = converter_nii.run(path_dcms, out_dir)
     assert len(output_paths) == 1
-    assert out_dir in str(output_paths[0])
+    assert str(out_dir) in str(output_paths[0])
     [os.remove(path) for path in output_paths]
