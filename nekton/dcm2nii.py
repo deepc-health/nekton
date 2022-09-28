@@ -160,7 +160,7 @@ class Dcm2Nii(BaseConverter):
                 raise RuntimeError(f"Error renaming output NifTi: {err}")
 
         print(
-            f"\nConverted {len(all_dcm_paths)} DCM to Nifti; Output stored @ {converted_file_paths[0].parent}\n"
+            f"\nConverted {len(all_dcm_paths)} DCM to Nifti; Output stored @ {Path(converted_file_paths[0]).parent}\n"
         )
 
         return converted_file_paths

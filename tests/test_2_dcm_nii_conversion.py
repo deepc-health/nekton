@@ -73,7 +73,10 @@ def test_2_4_check_store_new_loc(converter_nii, site_package_path):
         site_package_path, "pydicom/data/test_files/dicomdirtests/98892001/CT5N/"
     )
 
-    out_dir = "pydicom/data/test_files/"
+    out_dir = os.path.join(
+        site_package_path, "pydicom/data/test_files/"
+    )
+
     output_paths = converter_nii.run(path_dcms, out_dir)
     assert len(output_paths) == 1
     assert out_dir in str(output_paths[0])

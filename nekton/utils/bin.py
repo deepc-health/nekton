@@ -34,7 +34,7 @@ def run_bin(path: str, outpath:str=None):
 
     else:
         process = subprocess.Popen(
-            [PATH_TO_BIN, "-z", "y", path, "-o", outpath],
+            [PATH_TO_BIN, "-z", "y","-o", outpath, path],
             stdout=subprocess.PIPE,
             universal_newlines=True,
         )
