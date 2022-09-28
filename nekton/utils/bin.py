@@ -18,7 +18,7 @@ def make_exec_bin():
     process.communicate()
 
 
-def run_bin(path: str, outpath:str=None):
+def run_bin(path: str, outpath:str = None):
     """run the binary on a given directory
 
     Args:
@@ -30,14 +30,10 @@ def run_bin(path: str, outpath:str=None):
             stdout=subprocess.PIPE,
             universal_newlines=True,
         )
-        
-
     else:
         process = subprocess.Popen(
             [PATH_TO_BIN, "-z", "y","-o", outpath, path],
             stdout=subprocess.PIPE,
             universal_newlines=True,
         )
-
-
     process.communicate()
