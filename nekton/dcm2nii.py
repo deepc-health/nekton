@@ -69,7 +69,7 @@ class Dcm2Nii(BaseConverter):
         )
         return False if len(all_slice_thickness) == 1 else True
 
-    def _run_conv_variable(self, dicom_directory: Path, out_directory: Path) -> List[Path]:
+    def _run_conv_variable(self, dicom_directory: Path, out_directory: Path, ignore_flag:bool= False) -> List[Path]:
         raise NotImplementedError(
             "DICOM with variable slice thickness cannot to be handled yet!!"
         )
@@ -107,7 +107,7 @@ class Dcm2Nii(BaseConverter):
             out_file_list.append(rename_file(str(file_path), fname))
         return out_file_list
 
-    def _run_conv_uniform(self, dicom_directory: Path, out_directory:Path,ignore_flag:bool) -> List[Path]:
+    def _run_conv_uniform(self, dicom_directory: Path, out_directory:Path,ignore_flag:bool= False) -> List[Path]:
         """run the binary on the input directory
 
         Args:
@@ -122,7 +122,7 @@ class Dcm2Nii(BaseConverter):
         output_files = list(Path(dicom_directory).glob("*.nii*"))
         return output_files
 
-    def run(self, dicom_directory: Path, out_directory:Path=None, name: str = "",ignore_flag: bool=None) -> List[Path]:
+    def run(self, dicom_directory: Path, out_directory:Path=None, name: str = "",ignore_flag: bool=False) -> List[Path]:
         """Run the dcm to nifti conversion in a directory
 
         Args:
