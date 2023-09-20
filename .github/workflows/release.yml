@@ -48,6 +48,7 @@ jobs:
     concurrency: release
     permissions:
       id-token: write
+      contents: write
     steps:
       - uses: actions/setup-python@v2
         with:
