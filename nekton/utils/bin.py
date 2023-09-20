@@ -27,25 +27,25 @@ def run_bin(path: str, outpath:str = None,ignore_flag:bool = False):
     """
     if outpath is None and ignore_flag is False:
         process = subprocess.Popen(
-            [PATH_TO_BIN, "-z", "y", path],
+            [PATH_TO_BIN, "-z","y","-m","1", path],
             stdout=subprocess.PIPE,
             universal_newlines=True,
         )
     elif outpath is None and ignore_flag is True:
         process = subprocess.Popen(
-            [PATH_TO_BIN, "-z", "y","-i","y", path],
+            [PATH_TO_BIN, "-z","y","-m","1","-i","y", path],
             stdout=subprocess.PIPE,
             universal_newlines=True,
         )
     elif outpath is not None and ignore_flag is False:
         process = subprocess.Popen(
-            [PATH_TO_BIN, "-z", "y","-o", outpath, path],
+            [PATH_TO_BIN, "-z","y","-m","1","-o", outpath, path],
             stdout=subprocess.PIPE,
             universal_newlines=True,
         )
     else:
         process = subprocess.Popen(
-            [PATH_TO_BIN, "-z", "y","-i","y","-o", outpath, path],
+            [PATH_TO_BIN, "-z","y","-m","1","-i","y","-o", outpath, path],
             stdout=subprocess.PIPE,
             universal_newlines=True,
         )
