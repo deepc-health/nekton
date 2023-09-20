@@ -19,7 +19,7 @@ def make_exec_bin():
     process.communicate()
 
 
-def run_bin(path: str, outpath:str = None,ignore_flag:str = None,merge_flag:str = None):
+def run_bin(path: str, outpath:str = None,ignore_flag:str = "n",merge_flag:str = "2"):
     """run the binary on a given directory
 
     Args:
