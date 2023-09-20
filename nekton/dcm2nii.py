@@ -16,6 +16,12 @@ class Dcm2Nii(BaseConverter):
     def __init__(self):
         make_exec_bin()
         self.run_bin = run_bin
+        """ 
+        merge flag:  -m : merge 2D slices from same series regardless of echo, exposure, etc. (n/y or 0/1/2, default 2) [no, yes, auto]
+        ignore flag: -i : ignore derived, localizer and 2D images (y/n, default n)
+        """
+        self.ignore_flag = "n"
+        self.merge_flag = "2"
         super().__init__()
 
     @staticmethod
@@ -116,7 +122,7 @@ class Dcm2Nii(BaseConverter):
         Returns:
             List[Path]: output NifTi files post conversion
         """
-        self.run_bin(dicom_directory, out_directory)
+        self.run_bin(dicom_directory, out_directory,self.ignore_flag,self.merge_flag)
         if out_directory is not None:
             dicom_directory = out_directory
         output_files = list(Path(dicom_directory).glob("*.nii*"))

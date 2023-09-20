@@ -1,3 +1,4 @@
+#!/bin/sh
 import subprocess
 import os
 
@@ -18,7 +19,7 @@ def make_exec_bin():
     process.communicate()
 
 
-def run_bin(path: str, outpath:str = None):
+def run_bin(path: str, outpath:str = None,ignore_flag:str = "n",merge_flag:str = "2"):
     """run the binary on a given directory
 
     Args:
@@ -26,13 +27,13 @@ def run_bin(path: str, outpath:str = None):
     """
     if outpath is None:
         process = subprocess.Popen(
-            [PATH_TO_BIN, "-z", "y", path],
+            [PATH_TO_BIN, "-z","y","-m",merge_flag,"-i",ignore_flag, path],
             stdout=subprocess.PIPE,
             universal_newlines=True,
         )
     else:
         process = subprocess.Popen(
-            [PATH_TO_BIN, "-z", "y","-o", outpath, path],
+            [PATH_TO_BIN, "-z","y","-m",merge_flag,"-i",ignore_flag,"-o", outpath, path],
             stdout=subprocess.PIPE,
             universal_newlines=True,
         )
