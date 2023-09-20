@@ -19,33 +19,21 @@ def make_exec_bin():
     process.communicate()
 
 
-def run_bin(path: str, outpath:str = None,ignore_flag:bool = False):
+def run_bin(path: str, outpath:str = None,ignore_flag:str = None,merge_flag:str = None):
     """run the binary on a given directory
 
     Args:
         path ([str]): directory where dicom exists
     """
-    if outpath is None and ignore_flag is False:
+    if outpath is None:
         process = subprocess.Popen(
-            [PATH_TO_BIN, "-z","y","-m","1", path],
-            stdout=subprocess.PIPE,
-            universal_newlines=True,
-        )
-    elif outpath is None and ignore_flag is True:
-        process = subprocess.Popen(
-            [PATH_TO_BIN, "-z","y","-m","1","-i","y", path],
-            stdout=subprocess.PIPE,
-            universal_newlines=True,
-        )
-    elif outpath is not None and ignore_flag is False:
-        process = subprocess.Popen(
-            [PATH_TO_BIN, "-z","y","-m","1","-o", outpath, path],
+            [PATH_TO_BIN, "-z","y","-m",merge_flag,"-i",ignore_flag, path],
             stdout=subprocess.PIPE,
             universal_newlines=True,
         )
     else:
         process = subprocess.Popen(
-            [PATH_TO_BIN, "-z","y","-m","1","-i","y","-o", outpath, path],
+            [PATH_TO_BIN, "-z","y","-m",merge_flag,"-i",ignore_flag,"-o", outpath, path],
             stdout=subprocess.PIPE,
             universal_newlines=True,
         )
