@@ -9,7 +9,7 @@ readme = 'README.md'
 keywords = ["dicom", "medical-imaging", "nifti",  "dicom-seg", "gsps"]
 
 [tool.poetry.dependencies]
-python = "3.6.9"
+python = "^3.6.9"
 nibabel = "^3.2.2"
 pydicom = "^2.3.0"
 numpy = "^1.19.5"
