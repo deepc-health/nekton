@@ -69,7 +69,7 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           root_options: '-vv'
   
-      - name: Publish package distributions to PyPI
+      - name: Publish package distributions to PyPI 
         uses: pypa/gh-action-pypi-publish@release/v1
         # NOTE: DO NOT wrap the conditional in ${{ }} as it will always evaluate to true.
         # See https://github.com/actions/runner/issues/1173
