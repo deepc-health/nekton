@@ -14,7 +14,7 @@ nibabel = "^3.2.2"
 pydicom = "^2.3.0"
 numpy = "^1.26.0"
 pydicom-seg = "0.3.0"
-SimpleITK = "^2.3.0"
+SimpleITK = "^2.1.1"
 
 
 [tool.poetry.dev-dependencies]
