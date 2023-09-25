@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "nekton"
-version = "0.2.6"
+version = "0.2.5"
 description = "A python package for DICOM to NifTi and NifTi to DICOM-SEG and GSPS conversion"
 authors = ["a-parida12 <abhijeet@deepc.ai>"]
 license = "MIT"
@@ -9,10 +9,10 @@ readme = 'README.md'
 keywords = ["dicom", "medical-imaging", "nifti",  "dicom-seg", "gsps"]
 
 [tool.poetry.dependencies]
-python = "3.10.8"
+python = "3.6.9"
 nibabel = "^3.2.2"
 pydicom = "^2.3.0"
-numpy = "^1.26.0"
+numpy = "^1.19.5"
 pydicom-seg = "0.3.0"
 SimpleITK = "^2.1.1"
 
